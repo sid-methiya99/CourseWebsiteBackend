@@ -1,7 +1,7 @@
 const express = require("express");
-const { userRouter } = require("../db/user");
-const { adminRouter } = require("../db/admin");
-const { courseRouter } = require("../db/courses");
+const { userRouter } = require("./user/user");
+const { adminRouter } = require("./admin/admin");
+const { courseRouter } = require("./course/course");
 const router = express.Router()
 
 router.use("/user", userRouter)
