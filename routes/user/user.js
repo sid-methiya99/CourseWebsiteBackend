@@ -43,10 +43,43 @@ userRouter.post('/signup', async (req, res) => {
 })
 
 userRouter.post('/login', async (req, res) => {
-    res.status(200).json({
-        msg: 'Signup Successful',
-        token: jwtKey
-    })
+    const username = req.body.username;
+    const password = req.body.password;
+
+    if (!username || !password) {
+        return res.status(411).json({
+            message: "Missing either username or password"
+        })
+    }
+
+    const findExistingUsername = await Users.findOne({ username })
+    if (!findExistingUsername) {
+        return res.status(411).json({
+            message: "Username not found"
+        })
+    }
+
+    const matchPassword = await findExistingUsername.comparePassword(password);
+
+    if (!matchPassword) {
+        return res.status(411).json({
+            message: "Incorrect password"
+        })
+    }
+
+    try {
+        const userId = findExistingUsername._id;
+        const jwtToken = jwt.sign({
+            userId
+        }, process.env.JWT_SECRET_KEY)
+
+        res.status(200).json({
+            msg: 'Signup Successful',
+            token: jwtToken
+        })
+    } catch (error) {
+        console.error(error)
+    }
 })
 
 // Lists all the courses

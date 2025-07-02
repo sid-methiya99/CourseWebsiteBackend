@@ -12,10 +12,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    coursesId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Courses'
-    }
+    firstName: {
+        type: String,
+        required: true,
+    },
+    lastName: {
+        type: String,
+        required: true,
+    },
 })
 
 userSchema.pre('save', async function(next) {

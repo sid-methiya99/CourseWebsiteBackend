@@ -10,10 +10,14 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    courses: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Courses'
-    }
+    firstName: {
+        type: String,
+        required: true,
+    },
+    lastName: {
+        type: String,
+        required: true,
+    },
 })
 
 module.exports = {
