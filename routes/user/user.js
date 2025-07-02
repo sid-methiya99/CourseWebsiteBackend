@@ -1,9 +1,10 @@
 
 require("dotenv").config()
 const express = require("express");
-const { Users } = require("../../db/dbIndex");
+const { Users, Courses, Purchases } = require("../../db/dbIndex");
 const userRouter = express.Router()
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const { userMiddleware } = require("../../utils/userMiddleware");
 
 userRouter.post('/signup', async (req, res) => {
     const username = req.body.username;
@@ -86,31 +87,67 @@ userRouter.post('/login', async (req, res) => {
     }
 })
 
+// Purchase a course
+userRouter.post('/courses/:courseId', userMiddleware, async (req, res) => {
+    const courseId = req.params.courseId;
+    const userId = req.userId;
+
+    try {
+
+        const purchaseCourse = await Purchases.create({
+            courseId: courseId,
+            userId: userId
+        })
+
+        res.status(200).json({
+            message: "Course Purchase successful"
+        })
+
+    } catch (error) {
+        console.error(error)
+    }
+
+})
 // Lists all the courses
 userRouter.get('/courses', async (req, res) => {
-    res.status(200).json({
-        msg: 'Signup Successful',
-        token: jwtKey
-    })
+    try {
+        const getAllCourses = await Courses.find()
+        res.status(200).json({
+            getAllCourses
+        })
+    } catch (error) {
+        console.error(error)
+    }
 })
-
-// Purchase a course
-userRouter.post('/courses/:courseId', async (req, res) => {
-    res.status(200).json({
-        msg: 'Signup Successful',
-        token: jwtKey
-    })
-})
-
 
 // List all courses purchased by user
-userRouter.get('/purchasedCourses', async (req, res) => {
-    res.status(200).json({
-        msg: 'Signup Successful',
-        token: jwtKey
-    })
-})
+userRouter.get('/purchasedCourses', userMiddleware, async (req, res) => {
+    const userId = req.userId;
+    console.log(userId)
 
+    try {
+        const allPurchaseCourseId = await Purchases.find({
+            userId: userId
+        })
+
+        const purchasedCourseId = allPurchaseCourseId.map(p => p.courseId)
+
+        const allCoursesOfUser = await Courses.find({
+            _id: {
+                $in: purchasedCourseId
+            }
+        })
+        console.log(allPurchaseCourseId)
+
+        res.status(200).json({
+            allCoursesOfUser
+        })
+
+    } catch (error) {
+        console.error(error)
+    }
+
+})
 
 module.exports = {
     userRouter

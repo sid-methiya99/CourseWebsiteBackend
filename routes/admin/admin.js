@@ -125,12 +125,60 @@ adminRouter.post('/courses', adminMiddleware, async (req, res) => {
 
 // Edits an existing course
 adminRouter.put('/courses/:courseId', async (req, res) => {
+    const title = req.body.title;
+    const description = req.body.description;
+    const price = req.body.price;
+    const imageLink = req.body.imageLink;
+    const published = req.body.published;
+    const courseId = req.params.courseId;
 
+    if (!title || !description || !price || !imageLink || !published) {
+        return res.status(411).json({
+            message: "Missing value found in body"
+        })
+    }
+
+    const adminId = req.adminId;
+
+    try {
+        const createCourse = await Courses.findOneAndUpdate({
+            _id: courseId
+        }, {
+            $set: {
+                title,
+                description,
+                price,
+                imageLink,
+                published,
+                authorId: adminId
+            }
+        })
+
+        res.status(200).json({
+            msg: 'Course updated successfully',
+        })
+
+    } catch (error) {
+        console.error(error)
+    }
 })
 
 // Gets all courses of admins
-adminRouter.get('courses', async (req, res) => {
+adminRouter.get('/courses/', adminMiddleware, async (req, res) => {
+    const adminId = req.adminId;
 
+    try {
+        const createCourse = await Courses.find({
+            authorId: adminId
+        })
+
+        res.status(200).json({
+            createCourse
+        })
+
+    } catch (error) {
+        console.error(error)
+    }
 })
 
 module.exports = {
