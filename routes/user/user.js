@@ -8,6 +8,8 @@ const jwt = require("jsonwebtoken")
 userRouter.post('/signup', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
 
     if (!username || !password) {
         return res.status(411).json({
@@ -25,7 +27,9 @@ userRouter.post('/signup', async (req, res) => {
     try {
         const createUser = await Users.create({
             username: username,
-            password: password
+            password: password,
+            firstName: firstName,
+            lastName: lastName,
         })
 
         const userId = createUser._id;
@@ -74,7 +78,7 @@ userRouter.post('/login', async (req, res) => {
         }, process.env.JWT_SECRET_KEY)
 
         res.status(200).json({
-            msg: 'Signup Successful',
+            msg: 'Welcome back user',
             token: jwtToken
         })
     } catch (error) {
