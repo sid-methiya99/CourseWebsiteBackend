@@ -1,6 +1,6 @@
 require("dotenv").config()
 const express = require("express");
-const { Admins } = require("../../db/dbIndex");
+const { Admins, Courses } = require("../../db/dbIndex");
 const adminRouter = express.Router()
 const jwt = require("jsonwebtoken");
 const { adminMiddleware } = require("../../utils/adminMiddleware");
@@ -88,12 +88,39 @@ adminRouter.post('/login', async (req, res) => {
 
 // Creates a new course
 adminRouter.post('/courses', adminMiddleware, async (req, res) => {
-    console.log(adminMiddleware)
+    const title = req.body.title;
+    const description = req.body.description;
+    const price = req.body.price;
+    const imageLink = req.body.imageLink;
+    const published = req.body.published;
+
+    if (!title || !description || !price || !imageLink || !published) {
+        return res.status(411).json({
+            message: "Missing value found in body"
+        })
+    }
+
     const adminId = req.adminId;
-    console.log("Admin Id: ", adminId)
-    res.status(200).json({
-        msg: 'Welcome back admin',
-    })
+
+    try {
+        const createCourse = await Courses.create({
+            title,
+            description,
+            price,
+            imageLink,
+            published,
+            authorId: adminId
+        })
+
+        res.status(200).json({
+            msg: 'Course created successfully',
+            courseId: createCourse._id
+        })
+
+    } catch (error) {
+        console.error(error)
+    }
+
 })
 
 // Edits an existing course

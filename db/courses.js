@@ -24,7 +24,7 @@ const courseSchema = new mongoose.Schema({
         enum: ["true", "false"],
         required: true,
     },
-    authorName: {
+    authorId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Admin'
     }
